@@ -36,7 +36,9 @@ import com.littleye233.days.db.DaysDb
 import com.littleye233.days.db.DaysDbContent
 import com.littleye233.days.ui.theme.DaysTheme
 import kotlinx.datetime.toJavaInstant
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Period
 import java.util.TimeZone
 
 @ExperimentalMaterial3Api
@@ -78,6 +80,7 @@ fun HomeScreen(
 
 @Composable
 fun HomeScreenContent(innerPadding: PaddingValues, db: MutableState<DaysDbContent>) {
+    val nowDt = LocalDate.now()
     Column(
         modifier = Modifier
             .padding(innerPadding)
@@ -98,11 +101,12 @@ fun HomeScreenContent(innerPadding: PaddingValues, db: MutableState<DaysDbConten
                val dt = LocalDateTime.ofInstant(
                    it.instant.toJavaInstant(),
                    TimeZone.getDefault().toZoneId()
-               )
+               ).toLocalDate()
+               val period = Period.between(dt, nowDt)
                DayCard(
                    title = it.name,
-                   date = dt.toLocalDate(),
-                   days = 99999 // TODO
+                   date = dt,
+                   days = period.days
                )
            }
         }

@@ -14,6 +14,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.littleye233.days.ui.theme.DaysTheme
 import com.littleye233.days.util.getLocalFormattedDate
 import java.time.LocalDate
 
@@ -105,7 +107,11 @@ fun DayCard(title: String, date: LocalDate, days: Int) {
                         text = buildAnnotatedString {
                             append("$days ")
                             withStyle(style = MaterialTheme.typography.bodyLarge.toSpanStyle()) {
-                                append("days")
+                                if (days == 1 || days == -1) {
+                                    append("day")
+                                } else {
+                                    append("days")
+                                }
                             }
                         }
                     )
@@ -118,9 +124,20 @@ fun DayCard(title: String, date: LocalDate, days: Int) {
 @Preview
 @Composable
 fun DayCardPreview() {
-    DayCard(
-        "Test Title",
-        LocalDate.of(2023, 1, 1),
-        99999
-    )
+    DaysTheme {
+        Surface {
+            Column {
+                DayCard(
+                    "Test Title",
+                    LocalDate.of(2023, 1, 1),
+                    99999
+                )
+                DayCard(
+                    "Test Title",
+                    LocalDate.of(2023, 1, 1),
+                    1
+                )
+            }
+        }
+    }
 }
