@@ -1,9 +1,11 @@
 package com.littleye233.days.compose
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -14,6 +16,7 @@ import com.littleye233.days.compose.addday.AddDayScreen
 import com.littleye233.days.compose.home.HomeScreen
 import com.littleye233.days.db.DaysDb
 import com.littleye233.days.db.DaysDbContent
+import kotlinx.coroutines.launch
 
 @Composable
 fun DaysApp(dbContent: DaysDbContent) {
@@ -28,10 +31,12 @@ fun DaysAppNavHost(
     dbContent: DaysDbContent
 ) {
     val dbc = remember { mutableStateOf(dbContent) }
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
-            HomeScreen(dbc) { navController.navigate("addDay") }
+            HomeScreen(dbc, snackbarHostState) { navController.navigate("addDay") }
         }
         composable("addDay") {
             val context = LocalContext.current
@@ -43,6 +48,9 @@ fun DaysAppNavHost(
                     val db = DaysDb(context)
                     db.write(db.stringify(dbc.value))
                     navController.navigateUp()
+                    scope.launch {
+                        snackbarHostState.showSnackbar("Added a new day")
+                    }
                 }
             ))
         }

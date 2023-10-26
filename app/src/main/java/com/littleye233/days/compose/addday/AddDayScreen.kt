@@ -74,15 +74,19 @@ fun AddDayScreen(callbacks: AddDayCallbacks) {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                callbacks.onDoneClick(
-                    DayItem(
-                        name = textName.value,
-                        instant = Instant.fromEpochMilliseconds(dateMillis.longValue)
-                    )
-                )
-            }) {
-                Icon(Icons.Filled.Check, "Done")
+            if (textName.value != "") {
+                FloatingActionButton(
+                    onClick = {
+                        callbacks.onDoneClick(
+                            DayItem(
+                                name = textName.value,
+                                instant = Instant.fromEpochMilliseconds(dateMillis.longValue)
+                            )
+                        )
+                    }
+                ) {
+                    Icon(Icons.Filled.Check, "Done")
+                }
             }
         }
     ) {

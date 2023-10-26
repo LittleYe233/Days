@@ -16,6 +16,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -39,7 +41,11 @@ import java.util.TimeZone
 
 @ExperimentalMaterial3Api
 @Composable
-fun HomeScreen(db: MutableState<DaysDbContent>, onAddClick: () -> Unit) {
+fun HomeScreen(
+    db: MutableState<DaysDbContent>,
+    snackbarHostState: SnackbarHostState,
+    onAddClick: () -> Unit
+) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
@@ -63,7 +69,8 @@ fun HomeScreen(db: MutableState<DaysDbContent>, onAddClick: () -> Unit) {
             FloatingActionButton(onClick = onAddClick) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Day")
             }
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) {
         HomeScreenContent(it, db)
     }
@@ -109,7 +116,7 @@ fun HomeScreenContent(innerPadding: PaddingValues, db: MutableState<DaysDbConten
 fun HomeScreenPreview() {
     DaysTheme {
         Surface {
-            HomeScreen(mutableStateOf(DaysDb.DB_DEFAULT)) {}
+            HomeScreen(mutableStateOf(DaysDb.DB_DEFAULT), SnackbarHostState()) {}
         }
     }
 }
