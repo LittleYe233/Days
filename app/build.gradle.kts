@@ -1,3 +1,14 @@
+import java.util.Properties
+
+val f = rootProject.file("credentials.properties")
+var credentials: Properties? = null
+if (f.exists() && f.isFile) {
+    // See: https://stackoverflow.com/a/71934561/12002560
+    credentials = Properties().apply {
+        load(rootProject.file("credentials.properties").reader())
+    }
+}
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -7,6 +18,23 @@ plugins {
 android {
     namespace = "com.littleye233.days"
     compileSdk = 34
+
+    if (credentials != null) {
+        // See: https://gist.github.com/mileskrell/7074c10cb3298a2c9d75e733be7061c2
+        // And, how to verify: https://stackoverflow.com/a/7104680/12002560
+        signingConfigs {
+            create("release") {
+                storeFile = credentials!!["RELEASE_STORE_FILE"]?.let { file(it) }
+                storePassword = credentials!!["RELEASE_STORE_PASSWORD"].toString()
+                keyAlias = credentials!!["RELEASE_KEY_ALIAS"].toString()
+                keyPassword = credentials!!["RELEASE_KEY_PASSWORD"].toString()
+                enableV1Signing = true
+                enableV2Signing = true
+                enableV3Signing = true
+                enableV4Signing = true
+            }
+        }
+    }
 
     defaultConfig {
         applicationId = "com.littleye233.days"
@@ -32,10 +60,15 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (credentials != null) {
+                // See: https://gist.github.com/mileskrell/7074c10cb3298a2c9d75e733be7061c2
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
     compileOptions {
