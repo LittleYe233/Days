@@ -16,8 +16,8 @@ android {
         // Min SDK (2-digit) + Major (1-digit) + Minor (2-digit) + Patch (1-digit) + Other (2-digit)
         // Other means Alpha or Beta version code, from 01 to 98. 99 means final version.
         // See: https://developer.android.com/google/play/publishing/multiple-apks#VersionCodes
-        versionCode = 26001001
-        versionName = "0.1.0-alpha-1"
+        versionCode = 26001002
+        versionName = "0.1.0-alpha-2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
