@@ -75,7 +75,10 @@ fun DayCard(title: String, date: LocalDate, days: Int, modifier: Modifier = Modi
         ) {
             // Title and Date
             Column(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier
+                    .padding(16.dp)
+                    // @see https://stackoverflow.com/a/72590123/12002560
+                    .weight(1f)
             ) {
                 Text(
                     text = title,
@@ -136,6 +139,11 @@ fun DayCardPreview() {
                     "Test Title",
                     LocalDate.of(2023, 1, 1),
                     1
+                )
+                DayCard(
+                    "Test Title Test Title Test Title Test Title Test Title Test Title",
+                    LocalDate.of(2023, 1, 1),
+                    99999
                 )
             }
         }
