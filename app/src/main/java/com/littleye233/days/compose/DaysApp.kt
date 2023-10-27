@@ -8,12 +8,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.littleye233.days.compose.addday.AddDayCallbacks
 import com.littleye233.days.compose.addday.AddDayScreen
+import com.littleye233.days.compose.day.DayScreen
 import com.littleye233.days.compose.home.HomeScreen
+import com.littleye233.days.compose.home.HomeScreenCallback
 import com.littleye233.days.db.DaysDb
 import com.littleye233.days.db.DaysDbContent
 import kotlinx.coroutines.launch
@@ -36,7 +40,13 @@ fun DaysAppNavHost(
 
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
-            HomeScreen(dbc, snackbarHostState) { navController.navigate("addDay") }
+            HomeScreen(
+                dbc, snackbarHostState,
+                HomeScreenCallback(
+                    onAddClick = { navController.navigate("addDay") },
+                    onDayCardClick = { navController.navigate("day/$it") }
+                )
+            )
         }
         composable("addDay") {
             val context = LocalContext.current
@@ -53,6 +63,18 @@ fun DaysAppNavHost(
                     }
                 }
             ))
+        }
+        composable(
+            "day/{dayId}",
+            arguments = listOf(navArgument("dayId") { type = NavType.IntType })
+        ) {
+            val dayId = it.arguments?.getInt("dayId") ?: -1
+            if (dayId != -1) {
+                DayScreen(
+                    day = dbc.value.days[dayId],
+                    onBackClick = { navController.navigateUp() }
+                )
+            }
         }
     }
 }

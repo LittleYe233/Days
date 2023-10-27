@@ -1,6 +1,7 @@
 package com.littleye233.days.compose.home
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,12 +42,17 @@ import java.time.LocalDateTime
 import java.time.Period
 import java.util.TimeZone
 
+data class HomeScreenCallback(
+    val onAddClick: () -> Unit,
+    val onDayCardClick: (dayId: Int) -> Unit
+)
+
 @ExperimentalMaterial3Api
 @Composable
 fun HomeScreen(
     db: MutableState<DaysDbContent>,
     snackbarHostState: SnackbarHostState,
-    onAddClick: () -> Unit
+    callback: HomeScreenCallback
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -68,18 +74,22 @@ fun HomeScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddClick) {
+            FloatingActionButton(onClick = callback.onAddClick) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Day")
             }
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) {
-        HomeScreenContent(it, db)
+        HomeScreenContent(it, db, callback)
     }
 }
 
 @Composable
-fun HomeScreenContent(innerPadding: PaddingValues, db: MutableState<DaysDbContent>) {
+fun HomeScreenContent(
+    innerPadding: PaddingValues,
+    db: MutableState<DaysDbContent>,
+    callback: HomeScreenCallback
+) {
     val nowDt = LocalDate.now()
     Column(
         modifier = Modifier
@@ -97,16 +107,18 @@ fun HomeScreenContent(innerPadding: PaddingValues, db: MutableState<DaysDbConten
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-           db.value.days.forEach {
+           db.value.days.forEachIndexed { index, dayItem ->
                val dt = LocalDateTime.ofInstant(
-                   it.instant.toJavaInstant(),
+                   dayItem.instant.toJavaInstant(),
                    TimeZone.getDefault().toZoneId()
                ).toLocalDate()
                val period = Period.between(dt, nowDt)
                DayCard(
-                   title = it.name,
+                   title = dayItem.name,
                    date = dt,
-                   days = period.days
+                   days = period.days,
+                   modifier = Modifier
+                       .clickable(onClick = { callback.onDayCardClick(index) })
                )
            }
         }
@@ -120,7 +132,11 @@ fun HomeScreenContent(innerPadding: PaddingValues, db: MutableState<DaysDbConten
 fun HomeScreenPreview() {
     DaysTheme {
         Surface {
-            HomeScreen(mutableStateOf(DaysDb.DB_DEFAULT), SnackbarHostState()) {}
+            HomeScreen(
+                mutableStateOf(DaysDb.DB_DEFAULT),
+                SnackbarHostState(),
+                HomeScreenCallback({}, {})
+            )
         }
     }
 }

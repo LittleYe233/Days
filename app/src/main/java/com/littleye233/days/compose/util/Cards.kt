@@ -57,13 +57,13 @@ fun TopDateCard() {
 }
 
 @Composable
-fun DayCard(title: String, date: LocalDate, days: Int) {
+fun DayCard(title: String, date: LocalDate, days: Int, modifier: Modifier = Modifier) {
     // Main Card of This Day
     ElevatedCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
     ) {
         // Row Wrapper
