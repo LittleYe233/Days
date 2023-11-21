@@ -5,7 +5,7 @@ var credentials: Properties? = null
 if (f.exists() && f.isFile) {
     // See: https://stackoverflow.com/a/71934561/12002560
     credentials = Properties().apply {
-        load(rootProject.file("credentials.properties").reader())
+        load(f.reader())
     }
 }
 
