@@ -17,6 +17,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.littleye233.days.db.DayItem
@@ -27,8 +30,11 @@ import kotlinx.datetime.Clock
 @Composable
 fun DayScreen(
     day: DayItem,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onDeleteConfirm: () -> Unit
 ) {
+    val deleteState = remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -45,7 +51,7 @@ fun DayScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { deleteState.value = true }) {
                         Icon(
                             imageVector = Icons.Filled.Delete,
                             contentDescription = "Delete Day"
@@ -61,18 +67,40 @@ fun DayScreen(
             )
         }
     ) {
-        DayScreenContent(innerPadding = it, day)
+        DayScreenContent(
+            innerPadding = it,
+            day,
+            deleteState,
+            onDeleteConfirm = onDeleteConfirm
+        )
     }
 }
 
 @Composable
-fun DayScreenContent(innerPadding: PaddingValues, day: DayItem) {
+fun DayScreenContent(
+    innerPadding: PaddingValues,
+    day: DayItem,
+    deleteState: MutableState<Boolean>,
+    onDeleteConfirm: () -> Unit
+) {
     Column(
         modifier = Modifier
             .padding(innerPadding)
     ) {
         Text(day.name)
         Text(day.instant.toString())
+
+        // Deletion dialog
+        if (deleteState.value) {
+            DayDeleteDialog(
+                onDismissRequest = { deleteState.value = false },
+                onConfirmClick = {
+                    deleteState.value = false
+                    onDeleteConfirm()
+                },
+                onCancelClick = { deleteState.value = false }
+            )
+        }
     }
 }
 
@@ -82,9 +110,8 @@ fun DayScreenPreview() {
     DaysTheme {
         Surface {
             DayScreen(
-                DayItem(name = "test", instant = Clock.System.now()),
-                onBackClick = {}
-            )
+                DayItem(name = "test", instant = Clock.System.now()), {}
+            ) {}
         }
     }
 }

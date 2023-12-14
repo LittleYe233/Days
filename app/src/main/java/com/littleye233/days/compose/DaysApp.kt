@@ -1,5 +1,6 @@
 package com.littleye233.days.compose
 
+import android.util.Log
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -69,10 +70,23 @@ fun DaysAppNavHost(
             arguments = listOf(navArgument("dayId") { type = NavType.IntType })
         ) {
             val dayId = it.arguments?.getInt("dayId") ?: -1
-            if (dayId != -1) {
+            val context = LocalContext.current
+            if (dayId != -1 && dayId < dbc.value.days.size) {
                 DayScreen(
                     day = dbc.value.days[dayId],
-                    onBackClick = { navController.navigateUp() }
+                    onBackClick = { navController.navigateUp() },
+                    onDeleteConfirm = {
+                        Log.v("compose.DaysApp", "Database Content: ${dbc.value}")
+                        Log.v("compose.DaysApp", "dayId: $dayId")
+                        dbc.value.days.removeAt(dayId)
+                        dbc.value = dbc.value.copy()
+                        val db = DaysDb(context)
+                        db.write(db.stringify(dbc.value))
+                        navController.navigate("home")
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Deleted a day")
+                        }
+                    }
                 )
             }
         }
